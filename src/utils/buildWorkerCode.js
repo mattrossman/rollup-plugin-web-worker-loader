@@ -3,6 +3,7 @@ const kDefaultsOptions = {
     preserveSource: false,
     enableUnicode: false,
     targetPlatform: 'browser',
+    basePath: ''
 };
 
 const typeMap = {
@@ -37,7 +38,7 @@ function getArgsString(source, sourcemap, options) {
         const sourceArg = Buffer.from(source, options.enableUnicode ? 'utf16le' : 'utf8').toString('base64');
         return `'${sourceArg}', ${sourcemapArg}, ${options.enableUnicode.toString()}`;
     }
-    return `'${source}'`;
+    return `'${source}', '${options.basePath}'`;
 }
 
 function buildWorkerSource(options, factoryFuncName, argsString) {

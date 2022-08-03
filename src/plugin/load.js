@@ -50,7 +50,7 @@ function handleBundleGenerated(state, config, addWatchFile, id, workerID, result
             }
         } else {
             const workerPath = path.posix.join(config.outputFolder, workerID);
-            source = path.posix.join(config.loadPath, workerPath);
+            source = workerID
             chunk.fileName = workerPath;
             state.idMap.get(id).chunk = chunk;
         }
@@ -61,6 +61,7 @@ function handleBundleGenerated(state, config, addWatchFile, id, workerID, result
                 enableUnicode: config.enableUnicode,
                 targetPlatform: config.targetPlatform,
                 type: state.idMap.get(id).type,
+                basePath: config.loadPath || config.outputFolder
             }),
         };
     }
