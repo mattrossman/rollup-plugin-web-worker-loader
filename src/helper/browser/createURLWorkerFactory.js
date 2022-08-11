@@ -1,14 +1,38 @@
 export function createURLWorkerFactory(url, basePath) {
-    return function WorkerFactory(options, basePathOverride) {
+    /**
+     * @param {WorkerOptions} workerOptions
+     * @param {{ basePath?: string, useObjectUrl?: boolean }} factoryOptions
+     */
+    return function WorkerFactory(workerOptions, factoryOptions) {
+        // Optional defaults
+        factoryOptions = Object.assign(
+            {
+                basePath: undefined,
+                useObjectUrl: false,
+            },
+            factoryOptions
+        );
+
         let workerUrl;
         try {
-            workerUrl = new URL(url, basePathOverride ?? basePath).toString();
+            workerUrl = new URL(
+                url,
+                factoryOptions.basePath ?? basePath
+            ).toString();
         } catch (e) {
             workerUrl = new URL(
-                (basePathOverride ?? basePath) + "/" + url,
+                (factoryOptions.basePath ?? basePath) + "/" + url,
                 window.location.origin
             ).toString();
         }
-        return new Worker(workerUrl, options);
+
+        if (factoryOptions.useObjectUrl) {
+            // Workaround for browser security restrictions
+            const workerSrc = `importScripts("${workerUrl}")`;
+            workerUrl = URL.createObjectURL(new Blob([workerSrc]), {
+                type: "text/javascript",
+            });
+        }
+        return new Worker(workerUrl, workerOptions);
     };
 }
